@@ -1,22 +1,39 @@
 
-import os
 import time
-from flask import Flask, request, jsonify
-from flask_cors import CORS
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, HttpUrl
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 
+app = FastAPI(
+    title="Web Image Scraper API",
+    description="image scraper",
+    version="1.0.0"
+)
 
-app = Flask(__name__)
+origins = [
+    "http://localhost",
+    "http://localhost:3000",
+    "http://localhost:8000",
+]
 
-CORS(app)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
+class ScrapeRequest(BaseModel):
+    url: HttpUrl 
 
 def setup_driver():
-    print("Setting up Selenium WebDriver...")
+    print("Setting up Selenium WebDriver")
     service = Service(ChromeDriverManager().install())
     options = webdriver.ChromeOptions()
     options.add_argument("--headless")
@@ -48,30 +65,27 @@ def extract_image_urls(driver, base_url):
     return list(image_urls)
 
 
-@app.route('/scrape', methods=['POST'])
-def scrape_images():
-    data = request.get_json()
-    if not data or 'url' not in data:
-        return jsonify({"error": "URL is required"}), 400
-
-    target_url = data['url']
+@app.post("/scrape")
+async def scrape_images(request: ScrapeRequest):
+    target_url = str(request.url)
     print(f"Received request to scrape: {target_url}")
 
     driver = setup_driver()
     try:
         driver.get(target_url)
-        time.sleep(3) 
-        scroll_page(driver, attempts=3) 
+        time.sleep(3)
+        
+        scroll_page(driver, attempts=3)
+        
         urls = extract_image_urls(driver, target_url)
-        return jsonify({"image_urls": urls})
+        
+        return {"image_urls": urls}
 
     except Exception as e:
         print(f"An error occurred: {e}")
-        return jsonify({"error": str(e)}), 500
+        raise HTTPException(status_code=500, detail=str(e))
     finally:
         driver.quit()
         print("WebDriver session closed.")
 
 
-if __name__ == '__main__':
-    app.run(debug=True, host='127.0.0.1', port=5000)

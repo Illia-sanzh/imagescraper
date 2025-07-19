@@ -12,7 +12,7 @@ export default function App() {
     setError('');
     setIsLoading(true);
 
-    const backendApiUrl = 'http://127.0.0.1:5000/scrape';
+    const backendApiUrl = 'http://127.0.0.1:8000/scrape';
 
     try {
       const response = await fetch(backendApiUrl, {
