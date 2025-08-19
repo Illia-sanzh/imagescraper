@@ -1,4 +1,6 @@
 import time
+import os
+import uvicorn
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, HttpUrl
@@ -13,6 +15,7 @@ app = FastAPI(
     version="1.0.0"
 )
 
+
 origins = ["*"]
 
 app.add_middleware(
@@ -26,6 +29,7 @@ app.add_middleware(
 
 class ScrapeRequest(BaseModel):
     url: HttpUrl 
+
 
 def setup_driver():
     print("Setting up Selenium WebDriver for Docker")
@@ -83,3 +87,7 @@ async def scrape_images(request: ScrapeRequest):
     finally:
         driver.quit()
         print("WebDriver session closed.")
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
