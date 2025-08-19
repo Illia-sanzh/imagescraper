@@ -28,13 +28,14 @@ class ScrapeRequest(BaseModel):
     url: HttpUrl 
 
 def setup_driver():
+def setup_driver():
     print("Setting up Selenium WebDriver")
-    service = Service(ChromeDriverManager().install())
     options = webdriver.ChromeOptions()
     options.add_argument("--headless")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
+    options.add_argument("--disable-gpu")
+    service = Service(executable_path="/usr/bin/chromedriver") 
     driver = webdriver.Chrome(service=service, options=options)
     print("WebDriver setup complete.")
     return driver
