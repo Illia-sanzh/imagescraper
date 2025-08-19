@@ -1,4 +1,3 @@
-
 import time
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -87,5 +86,4 @@ async def scrape_images(request: ScrapeRequest):
     finally:
         driver.quit()
         print("WebDriver session closed.")
-
 
