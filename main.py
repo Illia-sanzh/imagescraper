@@ -28,7 +28,6 @@ class ScrapeRequest(BaseModel):
     url: HttpUrl 
 
 def setup_driver():
-def setup_driver():
     print("Setting up Selenium WebDriver")
     options = webdriver.ChromeOptions()
     options.add_argument("--headless")
