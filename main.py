@@ -1,10 +1,9 @@
 import time
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, HttpUrl
+from pantic import BaseModel, HttpUrl
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 
@@ -14,27 +13,16 @@ app = FastAPI(
     version="1.0.0"
 )
 
-origins = ["*"]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-class ScrapeRequest(BaseModel):
-    url: HttpUrl 
 
 def setup_driver():
-    print("Setting up Selenium WebDriver")
-    service = Service(ChromeDriverManager().install())
+    print("Setting up Selenium WebDriver for Docker")
     options = webdriver.ChromeOptions()
     options.add_argument("--headless")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
+    service = Service(executable_path='/usr/local/bin/chromedriver')
+    
     driver = webdriver.Chrome(service=service, options=options)
     print("WebDriver setup complete.")
     return driver
@@ -82,4 +70,3 @@ async def scrape_images(request: ScrapeRequest):
     finally:
         driver.quit()
         print("WebDriver session closed.")
-
