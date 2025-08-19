@@ -1,7 +1,7 @@
 import time
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pantic import BaseModel, HttpUrl
+from pydantic import BaseModel, HttpUrl
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from bs4 import BeautifulSoup
